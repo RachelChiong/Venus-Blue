@@ -1,0 +1,39 @@
+{
+	"name": "ROS2",
+	"build": {
+		"dockerfile": "dockerfile"
+	},
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined",
+		"--privileged",
+		"--network=host",
+		"--name",
+		"venus_blue"
+	],
+	"mounts": [
+		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+		"source=/mnt/wslg,target=/mnt/wslg,type=bind,consistency=cached"
+	],
+	"containerEnv": {
+		"DISPLAY": ":0", // ":${localEnv:DISPLAY}",
+		"WAYLAND_DISPLAY": "${localEnv:WAYLAND_DISPLAY}",
+		"XDG_RUNTIME_DIR": "${localEnv:$XDG_RUNTIME_DIR}",
+		"PULSE_SERVER": "${localEnv:PULSE_SERVER}"
+	},
+	"postStartCommand": "echo 127.0.0.1 `hostname` >> /etc/hosts",
+	"appPort": [
+		8080
+	],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/root/venus_blue,type=bind,consistency=cached",
+	"workspaceFolder": "/root/venus_blue",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-vscode.cmake-tools"
+			]
+		}
+	}
+}
