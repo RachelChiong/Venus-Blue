@@ -1,3 +1,10 @@
-FROM osrf/ros:humble-desktop
+FROM osrf/ros:noetic-desktop
 
-RUN apt update && apt install -y git
+RUN apt update && apt install -y \
+    git \
+    ros-noetic-dynamixel-sdk \
+    ros-noetic-turtlebot3-msgs \
+    ros-noetic-turtlebot3
+
+RUN echo source /opt/ros/noetic/setup.bash >> ~/.bashrc && \
+    echo exportP TURTLEBOT3_MODEL=waffle_pi >> ~/.bashrc
