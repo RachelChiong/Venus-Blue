@@ -9,18 +9,27 @@ Control the Turtlebot using ROS with a USB Foot Pedal interface. (max 4 team mem
 
 - Web Dashboard (Rachael)
     - Determine what the user interface has to display, including a map showing the location of the turtle-bot, the current robot state, the current control state.
-    - Block diagram
+    - Milestone
+        - System Overview
+        - Partial code implementation.
 - TurtleBot Localisation (Lauchie)
     - Determine how to get the LiDAR data.
     - Determine how to localise the turtlebot in space.
-    - Kalmann filter 
-    - DIKW Pyramid abstraction.
+    - Kalmann filter
+    - Milestone
+        - DIKW Pyramid abstraction.
+        - Partial code implementation.
 - TurtleBot Integration (Gabe)
     - Xbox controller for 
     - Integrating MQTT and ROS.
     - Handling ROS configuration.
-    - Has 5 KPIs which are sufficiently described in detail.
+    - Milestone:
+        - Has 5 KPIs which are sufficiently described in detail.
+        - System sensor integration.
+        - Partial code implementation.
 - Foot pedal (James)
     - Firmware for the nucleo board to interface with the foot pedal.
     - Getting the foot pedal.
-    - Network protocol diagram
+    - Milestone
+        - Network protocol diagram
+        - Partial code implementation.
