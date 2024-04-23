@@ -1,0 +1,5 @@
+flask
+highcharts
+paho-mqtt
+highcharts-core
+numpy
