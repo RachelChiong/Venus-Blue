@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>venusblue</name>
+  <version>0.0.0</version>
+  <description>The venusblue package</description>
+
+  <maintainer email="g.blomberg@uqconnect.edu.au">root</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Build dependancies -->
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>dynamixel_interface</depend>
+
+  <exec_depend>message_runtime</exec_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+  </export>
+</package>
