@@ -2,9 +2,30 @@ FROM osrf/ros:noetic-desktop
 
 RUN apt update && apt install -y \
     git \
+    vim \
     ros-noetic-dynamixel-sdk \
     ros-noetic-turtlebot3-msgs \
     ros-noetic-turtlebot3
 
+# Compile and install MQTT
+RUN git clone https://github.com/eclipse/paho.mqtt.c.git && \
+    cd paho.mqtt.c && \
+    cmake \
+        -DPAHO_BUILD_STATIC=TRUE \
+        -DPAHO_HIGH_PERFORMANCE=TRUE \
+        -DPAHO_WITH_SSL=TRUE \
+    --build . && \
+    cmake --build . --target install && \
+    cd .. && rm -rf paho.mqtt.c && \
+    git clone https://github.com/eclipse/paho.mqtt.cpp.git && \
+    cd paho.mqtt.cpp && \
+    cmake \
+        -Bbuild \
+        -H. \
+        -DPAHO_BUILD_STATIC=ON \
+        -DPAHO_BUILD_DOCUMENTATION=OFF && \
+    cd build && cmake --build . --target install && \
+    cd ../.. && rm -rf paho.mqtt.cpp
+
 RUN echo source /opt/ros/noetic/setup.bash >> ~/.bashrc && \
-    echo exportP TURTLEBOT3_MODEL=waffle_pi >> ~/.bashrc
+    echo export TURTLEBOT3_MODEL=waffle_pi >> ~/.bashrc

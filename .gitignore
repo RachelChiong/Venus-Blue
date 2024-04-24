@@ -3,6 +3,7 @@
 build
 devel
 turtlebot/src/CMakeLists.txt
+turtlebot/lib/
 
 # Prerequisites
 *.d

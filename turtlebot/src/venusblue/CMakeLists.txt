@@ -1,16 +1,25 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(venusblue)
 
-include(FetchContent)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
+find_package(Threads REQUIRED)
+find_package(OpenSSL REQUIRED)
 
-FetchContent_Declare(
-    paho-mqtt-src
-    GIT_REPOSITORY https://github.com/eclipse/paho.mqtt.cpp
-    GIT_SHALLOW TRUE
-    GIT_PROGRESS ON
-    SYSTEM
+catkin_package()
+
+include_directories(${catkin_INCLUDE_DIRS})
+
+add_executable(${PROJECT_NAME}_node src/main.cpp src/venusblue.cpp)
+set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME venusblue PREFIX "")
+
+target_link_libraries(
+    ${PROJECT_NAME}_node
+    libpaho-mqttpp3.a
+    libpaho-mqtt3as.a
+    Threads::Threads
+    OpenSSL::SSL
+    ${catkin_LIBRARIES}
 )
-FetchContent_MakeAvailable(paho-mqtt-src)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -18,14 +27,12 @@ FetchContent_MakeAvailable(paho-mqtt-src)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-)
+# find_package(catkin REQUIRED COMPONENTS
+#   roscpp
+#   std_msgs
+# )
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
+# System dependencies are found with CMake's conventions
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -112,12 +119,12 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
+# catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES venusblue
 #  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
-)
+# )
 
 ###########
 ## Build ##
@@ -125,10 +132,9 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+# include_directories(
+#   ${catkin_INCLUDE_DIRS}
+# )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
@@ -143,7 +149,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/venusblue_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/main.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
