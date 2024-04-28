@@ -8,6 +8,7 @@ CSSE4011
 import json
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
+from mqtt_thread import MqttThread
 
 __author__ = "Rachel Chiong"
 
@@ -16,8 +17,13 @@ MQTT_TOPIC = "TOPIC"
 
 app = Flask(__name__)
 
+# Handle CORS as necessary
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 @app.route('/')
-def hello():
+@cross_origin
+def root():
     return 'Hello from Flask backend!'
 
 if __name__ == '__main__':
