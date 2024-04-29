@@ -20,7 +20,6 @@ Control the Turtlebot using ROS with a USB Foot Pedal interface. (max 4 team mem
         - DIKW Pyramid abstraction.
         - Partial code implementation.
 - TurtleBot Integration (Gabe)
-    - Xbox controller for 
     - Integrating MQTT and ROS.
     - Handling ROS configuration.
     - Milestone:

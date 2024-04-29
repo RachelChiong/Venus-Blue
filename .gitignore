@@ -1,9 +1,12 @@
 .DS_Store
 
-build
-devel
+turtlebot/devel
+turtlebot/build
 turtlebot/src/CMakeLists.txt
+turtlebot/.catkin_tools
 turtlebot/lib/
+turtlebot/logs
+turtlebot/src/dynamixel_interface
 
 # Prerequisites
 *.d

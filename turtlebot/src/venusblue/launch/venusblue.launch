@@ -1,9 +1,9 @@
 <launch>
 
     <!-- Start the dynamixel driver node for interfacing with the dynamixel motors-->
-	<!-- <node name="dynamixel_interface_controller_node" pkg="dynamixel_interface" type="dynamixel_interface_controller_node" output="screen">
+	<node name="dynamixel_interface_controller_node" pkg="dynamixel_interface" type="dynamixel_interface_controller_node" output="screen">
 		<rosparam command="load" file="$(find dynamixel_interface)/config/controller_config.yaml" />
-	</node> -->
+	</node>
 
 	<node name="venusblue_node" pkg="venusblue" type="venusblue" output="screen">
 	</node>

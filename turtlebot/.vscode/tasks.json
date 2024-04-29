@@ -9,6 +9,13 @@
             "problemMatcher": []
         },
         {
+            "label": "Setup",
+            "type": "process",
+            "command": "./scripts/setup.bash",
+            "detail": "Setup the workspace.",
+            "problemMatcher": []
+        },
+        {
             "label": "Run",
             "type": "shell",
             "command": "source devel/setup.bash && rosrun ${input:package} ${input:executable}",
@@ -18,7 +25,7 @@
         {
             "label": "Build",
             "type": "shell",
-            "command": "catkin_make",
+            "command": "catkin build",
             "detail": "Build all packages and source code.",
             "problemMatcher": []
         },
