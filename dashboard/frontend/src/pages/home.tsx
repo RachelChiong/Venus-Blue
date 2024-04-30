@@ -10,7 +10,7 @@ import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import axios from 'axios';
 
-const backend_path = "http://127.0.0.1:5000";
+const backend_path = "http://127.0.0.1:5001";
 
 
 function Home() {
