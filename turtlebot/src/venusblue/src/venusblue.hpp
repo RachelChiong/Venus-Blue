@@ -23,15 +23,21 @@ private:
 
     bool connect_mqtt();
 
-    /// @brief The ROS node.
+    /// The ROS node.
     ros::NodeHandle *m_node;
 
-    /// @brief Topic to publish control commands to.
+    /// The mqtt broker server address.
+    std::string m_mqtt_server;
+
+    /// The mqtt broker port.
+    int m_mqtt_port;
+
+    /// Topic to publish control commands to.
     ros::Publisher m_publisher_control;
 
-    /// @brief Topic to publish robot state to.
+    /// Topic to publish robot state to.
     ros::Publisher m_publisher_state;
 
-    /// @brief The MQTT client connection.
+    /// The MQTT client connection.
     std::unique_ptr<mqtt::async_client> m_mqtt;
 };
