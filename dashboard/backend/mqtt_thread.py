@@ -33,20 +33,13 @@ class MqttThread(Thread):
         self.hostname = hostname
         self.topic = topic
         self.payload = ""
-        self.counter = 0
-        # Initialise the thread
-        try:
-            self.mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-            self.mqttc.on_connect = self.on_connect
-            self.mqttc.on_message = self.on_message
-            self.mqttc.on_subscribe = self.on_subscribe
-            self.mqttc.on_unsubscribe = self.on_unsubscribe
-            self.mqttc.connect(self.hostname)
-            print("Is connected: ", self.mqttc.is_connected())
-        except:
-            print("Issue initialising so skipping...")
-        print("MQTT client initialised")
-        self.get_payload()
+        self.mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        print(f"[LOG] {self.name} thread initialised")
+
+    def config(self, hostname, topic):
+        self.hostname = hostname
+        self.topic = topic
+        print(f"[LOG] {self.name} Hostname: {self.hostname} Topic: {self.topic}")
 
     def get_payload(self):
         """
@@ -56,10 +49,6 @@ class MqttThread(Thread):
         Returns:
             payload (str): JSON packet containing the distance
         """
-        if self.payload == "":
-            payload = f'{{\"distance\": {self.counter}}}'
-            self.counter = self.counter + 1
-            return json.loads(payload)
         return self.payload
 
     def run(self):
@@ -95,8 +84,6 @@ class MqttThread(Thread):
         payload = message.payload.decode("utf-8")  # Decode payload as text
         try:
             self.payload = json.loads(payload)  # Load JSON data
-            distance = self.payload['distance'] / 100  # Access the 'distance' value and convert to meters
-            kalman.ultrasonic.update_kalman(distance) # update kalman filter with distance
         except json.JSONDecodeError:
             print("Received invalid JSON payload.")
 
@@ -116,6 +103,19 @@ class MqttThread(Thread):
         """
         Client loop which constantly listens for MQTT messages
         """
+        # Initialise the thread
+        try:
+            self.mqttc.on_connect = self.on_connect
+            self.mqttc.on_message = self.on_message
+            self.mqttc.on_subscribe = self.on_subscribe
+            self.mqttc.on_unsubscribe = self.on_unsubscribe
+            self.mqttc.connect(self.hostname)
+            print("Is connected: ", self.mqttc.is_connected())
+        except:
+            print("Issue initialising so skipping...")
+
+        print("MQTT client initialised")
+        self.get_payload()
         print("Starting loop...")
         self.mqttc.loop_forever()
 
