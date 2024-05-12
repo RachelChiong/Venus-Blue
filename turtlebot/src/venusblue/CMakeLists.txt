@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(venusblue)
 
+include(FetchContent)
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
 find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
@@ -18,6 +23,7 @@ target_link_libraries(
     libpaho-mqtt3as.a
     Threads::Threads
     OpenSSL::SSL
+    nlohmann_json::nlohmann_json
     ${catkin_LIBRARIES}
 )
 
