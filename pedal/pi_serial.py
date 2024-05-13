@@ -8,7 +8,7 @@ from threading import Thread
 # data is sent for some reason
 SERIAL_DEVICE = '/dev/ttyACM0'
 
-BAUD_RATE = 19200
+BAUD_RATE = 115200
 base_node_serial = serial.Serial(SERIAL_DEVICE, BAUD_RATE, timeout=None)
 
 class NucleoConnection(Thread):

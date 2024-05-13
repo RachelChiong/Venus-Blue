@@ -1,0 +1,3 @@
+../Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_pedal.c:151:20:USBH_HID_PedalInit	3
+../Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_pedal.c:190:25:USBH_HID_GetPedalInfo	2
+../Middlewares/ST/STM32_USB_Host_Library/Class/HID/Src/usbh_hid_pedal.c:208:27:USBH_HID_PedalDecode	4
