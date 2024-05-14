@@ -2,13 +2,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Core",
-            "type": "process",
-            "command": "roscore",
-            "detail": "Start the ros core to enable messaging.",
-            "problemMatcher": []
-        },
-        {
             "label": "Setup",
             "type": "process",
             "command": "./scripts/setup.bash",
@@ -16,16 +9,9 @@
             "problemMatcher": []
         },
         {
-            "label": "Run",
-            "type": "shell",
-            "command": "source devel/setup.bash && rosrun ${input:package} ${input:executable}",
-            "problemMatcher": [],
-            "detail": "Run an executable."
-        },
-        {
             "label": "Build",
             "type": "shell",
-            "command": "catkin build",
+            "command": "colcon build --symlink-install",
             "detail": "Build all packages and source code.",
             "presentation": {
                 "echo": true,
@@ -38,37 +24,11 @@
             "problemMatcher": []
         },
         {
-            "label": "Clean",
-            "detail": "Remove all build files.",
-            "type": "shell",
-            "command": "catkin clean && rm -rf .catkin_tools",
-            "problemMatcher": []
-        },
-        {
             "label": "Launch",
             "detail": "Launches venusblue.",
             "type": "shell",
-            "command": "source devel/setup.bash && roslaunch venusblue venusblue.launch",
+            "command": "source install/setup.bash && ros2 launch venusbluepy venusblue.launch",
             "problemMatcher": []
-        },
-        {
-            "label": "Dependancies",
-            "detail": "List all dependencies.",
-            "type": "shell",
-            "command": "cd src && rospack depends venusblue",
-            "problemMatcher": []
-        }
-    ],
-    "inputs": [
-        {
-            "id": "package",
-            "type": "promptString",
-            "description": "The name of the package of the executable?"
-        },
-        {
-            "id": "executable",
-            "type": "promptString",
-            "description": "The filename ofthe executable?"
         }
     ]
 }

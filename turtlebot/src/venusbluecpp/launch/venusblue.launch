@@ -6,12 +6,10 @@
 		<env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}"/>
 	</node> -->
 
-	<node name="venusblue" pkg="venusblue" type="venusblue" output="screen">
+	<node pkg="venusbluecpp" exec="venusbluecpp" name="venusbluecpp" output="screen">
 		<env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}"/>
+		<param name="mqtt_server" value="'csse4011-iot.zones.eait.uq.edu.au:1883'"></param>
+		<param name="mqtt_timeout" value="0"></param>
 	</node>
-
-	<!-- Parameters -->
-	<param name="mqtt_server" type="string" value="csse4011-iot.zones.eait.uq.edu.au"></param>
-	<param name="mqtt_port" type="int" value="1883"></param>
 
 </launch>

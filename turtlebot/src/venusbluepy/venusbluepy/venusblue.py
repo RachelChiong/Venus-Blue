@@ -1,0 +1,163 @@
+import json
+import argparse
+import asyncio
+import paho.mqtt.client as mqtt
+
+import rclpy
+from rclpy.node import Node
+
+from geometry_msgs.msg import Twist
+
+class VenusBlue(Node):
+
+    def __init__(
+            self,
+            server = 'csse4011-iot.zones.eait.uq.edu.au',
+            port = 1883
+        ):
+        super().__init__('venusblue')
+
+        # Mqtt client to get messages from.
+        self._client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+
+        # Declare parameters
+        self.declare_parameter('mqtt_server', 'csse4011-iot.zones.eait.uq.edu.au')
+        self.declare_parameter('mqtt_port', 1883)
+        self.declare_parameter('pedal_topic', 'venusBlueFootPedal')
+        self.declare_parameter('motor_topic', 'cmd_vel')
+
+        # Messages from mqtt to handle.
+        self._messages = asyncio.Queue()
+
+    async def mqtt_task(self):
+
+        self._client.suppress_exceptions = True
+
+        @self._client.connect_callback()
+        def connect_callback(client, userdata, flags, reason_code, properties):
+            if reason_code.is_failure:
+                self.get_logger().error(f'failed to connect: {reason_code}')
+                return
+
+            self.get_logger().info('connected')
+            client.subscribe(self._input_topic)
+
+        @self._client.disconnect_callback()
+        def disconnect_callback(client, userdata):
+            self.get_logger().info(f'disconnected')
+
+        @self._client.subscribe_callback()
+        def subscribe_callback(client, userdata, mid, reason_code_list, properties):
+            """Callback on subscribing to a mqtt topic."""
+            if reason_code_list[0].is_failure:
+                self.get_logger().error(f"mqtt subscription failed: {reason_code_list[0]}")
+            else:
+                self.get_logger().info(f"mqtt subscribed")
+
+        @self._client.unsubscribe_callback()
+        def unsubscribe_callback(client, userdata, mid, reason_code_list, properties):
+            """Callback on unsubscribing to a mqtt topic."""
+            if len(reason_code_list) == 0 or not reason_code_list[0].is_failure:
+                self.get_logger().info("mqtt unsubscribed")
+            else:
+                self.get_logger().error(f"mqtt failed to unsubscribe: {reason_code_list[0]}")
+
+        @self._client.message_callback()
+        def message_callback(client, userdata, message: mqtt.MQTTMessage):
+            """Push a message received over mqtt to the message queue"""
+
+            try:
+                parsed = json.loads(message.payload)
+                message = (
+                    int(parsed['x']),
+                    int(parsed['y']),
+                    int(parsed['z'])
+                )
+            except Exception as err:
+                self.get_logger().error(f'Failed to parse json {message.payload}: {err}')
+                return
+
+            try:
+                self._messages.put_nowait(message)
+            except Exception as err:
+                self.get_logger().error(f'Message queue full. Dropping message.')
+
+        self._client.loop_start()
+
+        # Connect to mqtt
+        while True:
+            server = self.get_parameter('mqtt_server').value
+            port = self.get_parameter('mqtt_port').value
+            try:
+                self.get_logger().info(f'mqtt connect to {server} at {port}')
+                error = self._client.connect(host = server, port = port)
+            except Exception as err:
+                self.get_logger().error(f'{err}')
+                await asyncio.sleep(1)
+                continue
+
+            if error:
+                self.get_logger().error(mqtt.error_string(error))
+                await asyncio.sleep(1)
+                continue
+
+            while True:
+                self._messages.put_nowait((0, 0, 0))
+                await asyncio.sleep(1)
+
+    async def tester(self):
+        while rclpy.ok():
+            self._messages.put_nowait((0, 0, 0))
+            await asyncio.sleep(1)
+
+    async def ros_update(self):
+        while rclpy.ok():
+            rclpy.spin_once(self, timeout_sec = 0.1)
+            await asyncio.sleep(0.1)
+
+    async def ros_task(self):
+
+        motor_topic = self.get_parameter('motor_topic').value
+        commander = self.create_publisher(Twist, motor_topic, 10)
+
+        while rclpy.ok():
+
+            # Wait for a command message.
+            x, y, z = await self._messages.get()
+
+            vx = float((x & 0x7F) / 128.0 * 6)
+            vy = float((y & 0x3f) / 64 * 6)
+
+            twist = Twist()
+
+            twist.linear.x = vx
+            twist.linear.y = vy
+            twist.linear.z = 0.0
+            twist.angular.x = vx
+            twist.angular.y = vy
+            twist.angular.z = 0.0
+
+            # self._client.publish(
+            #     'venusBlueTelemetry',
+            #     json.dumps({"vx": vx, "vy": vy})
+            # )
+        
+            self.get_logger().info(f'send twist {twist}')
+            commander.publish(twist)
+
+    async def main(self):
+        await asyncio.gather(
+            # self.mqtt_task(),
+            self.tester(),
+            self.ros_task(),
+            self.ros_update()
+        )
+
+def main():
+    rclpy.init()
+    node = VenusBlue()
+    asyncio.run(node.main())
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

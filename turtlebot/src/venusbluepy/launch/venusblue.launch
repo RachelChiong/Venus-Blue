@@ -1,0 +1,8 @@
+<launch>
+	<node pkg="venusbluepy" exec="venusblue" name="venusblue" output="screen">
+		<env name="ROSCONSOLE_FORMAT" value="[${severity}] [${time}] [${node}]: ${message}"/>
+		<param name="mqtt_server" value="'127.0.0.1'"></param>
+		<param name="mqtt_port" value="1883"></param>
+		<param name="mqtt_timeout" value="0"></param>
+	</node>
+</launch>

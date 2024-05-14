@@ -1,12 +1,12 @@
-FROM osrf/ros:noetic-desktop
+FROM osrf/ros:humble-desktop
 
 RUN apt update && apt install -y \
     git \
     vim \
-    ros-noetic-dynamixel-sdk \
-    ros-noetic-turtlebot3-msgs \
-    ros-noetic-turtlebot3 \
-    python3-catkin-tools
+    wget \
+    ros-humble-dynamixel-sdk \
+    ros-humble-turtlebot3-msgs \
+    ros-humble-turtlebot3
 
 # Compile and install MQTT
 RUN git clone https://github.com/eclipse/paho.mqtt.c.git && \
@@ -14,8 +14,7 @@ RUN git clone https://github.com/eclipse/paho.mqtt.c.git && \
     cmake \
         -DPAHO_BUILD_STATIC=TRUE \
         -DPAHO_HIGH_PERFORMANCE=TRUE \
-        -DPAHO_WITH_SSL=TRUE \
-    --build . && \
+        -DPAHO_WITH_SSL=TRUE && \
     cmake --build . --target install && \
     cd .. && rm -rf paho.mqtt.c && \
     git clone https://github.com/eclipse/paho.mqtt.cpp.git && \
@@ -28,5 +27,7 @@ RUN git clone https://github.com/eclipse/paho.mqtt.c.git && \
     cd build && cmake --build . --target install && \
     cd ../.. && rm -rf paho.mqtt.cpp
 
-RUN echo source /opt/ros/noetic/setup.bash >> ~/.bashrc && \
-    echo export TURTLEBOT3_MODEL=waffle_pi >> ~/.bashrc
+RUN apt install -y python3-pip && \
+    pip3 install paho-mqtt
+
+RUN echo source /opt/ros/humble/setup.bash >> ~/.bashrc
