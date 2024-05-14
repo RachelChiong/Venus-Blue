@@ -26,14 +26,25 @@ Th_Footpedal = MqttThread("footpedal", HOST, MQTT_TOPIC)
 Th_Localisation = MqttThread("localisation", HOST, MQTT_TOPIC)
 Th_Telemetry = MqttThread("telemetry", HOST, MQTT_TOPIC)
 
+isConnected = 0
+
 @app.route('/')
-@cross_origin
+@cross_origin()
 def root():
+    Th_Footpedal.config(HOST, FOOTPEDAL_TOPIC)
+    Th_Localisation.config(HOST, LOCALISATION_TOPIC)
+    Th_Telemetry.config(HOST, TELEMETRY_TOPIC)
+
+    Th_Footpedal.start()
+    Th_Localisation.start()
+    Th_Telemetry.start()
     return 'Hello from Flask backend!'
 
-@app.route('/default')
-@cross_origin
+@app.route('/connect')
+@cross_origin()
 def default_connect():
+    if isConnected:
+        return
     Th_Footpedal.config(HOST, FOOTPEDAL_TOPIC)
     Th_Localisation.config(HOST, LOCALISATION_TOPIC)
     Th_Telemetry.config(HOST, TELEMETRY_TOPIC)
@@ -42,21 +53,25 @@ def default_connect():
     Th_Localisation.start()
     Th_Telemetry.start()
 
+    isConnected = 1
     return "Connected"
 
 @app.route('/telemetry')
-@cross_origin
+@cross_origin()
 def get_telemetry():
     return Th_Telemetry.get_payload()
 
 @app.route('/footpedal')
-@cross_origin
+@cross_origin()
 def get_footpedal():
-    return Th_Footpedal.get_payload()
+    payload = Th_Footpedal.get_payload()
+    print(payload)
+    return payload
 
 @app.route('/localisation')
-@cross_origin
+@cross_origin()
 def get_localisation():
+
     return Th_Localisation.get_payload()
 
 if __name__ == '__main__':
