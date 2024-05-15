@@ -31,13 +31,17 @@ isConnected = 0
 @app.route('/')
 @cross_origin()
 def root():
-    Th_Footpedal.config(HOST, FOOTPEDAL_TOPIC)
-    Th_Localisation.config(HOST, LOCALISATION_TOPIC)
-    Th_Telemetry.config(HOST, TELEMETRY_TOPIC)
+    if not isConnected:
+        Th_Footpedal.config(HOST, FOOTPEDAL_TOPIC)
+        Th_Localisation.config(HOST, LOCALISATION_TOPIC)
+        Th_Telemetry.config(HOST, TELEMETRY_TOPIC)
 
-    Th_Footpedal.start()
-    Th_Localisation.start()
-    Th_Telemetry.start()
+        Th_Footpedal.start()
+        Th_Localisation.start()
+        Th_Telemetry.start()
+
+        isConnected = 1
+
     return 'Hello from Flask backend!'
 
 @app.route('/connect')
@@ -75,4 +79,4 @@ def get_localisation():
     return Th_Localisation.get_payload()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run()
