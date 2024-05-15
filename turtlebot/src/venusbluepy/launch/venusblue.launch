@@ -5,4 +5,5 @@
 		<param name="mqtt_port" value="1883"></param>
 		<param name="mqtt_timeout" value="0"></param>
 	</node>
+	<include file="/opt/ros/humble/share/turtlebot3_cartographer/launch/cartographer.launch.py"/>
 </launch>

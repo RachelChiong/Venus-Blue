@@ -8,6 +8,7 @@ import rclpy
 from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
+from tf2_msgs.msg import TFMessage
 
 class VenusBlue(Node):
 
@@ -52,6 +53,22 @@ class VenusBlue(Node):
 
         # Messages from mqtt to handle.
         self._messages = asyncio.Queue()
+
+    
+
+    async def location_callback(self, msg):
+        telementry_topic = self.get_parameter('telementry_topic').value
+        for tf in msg.transforms:
+            source = tf.header.frame_id
+            if source == 'map':
+                x = tf.transform.translation.x
+                y = tf.transform.translation.y
+                self._client.publish(
+                    telementry_topic,
+                json.dumps({"xpos": x, "ypos": y})
+            )
+
+
 
     async def mqtt_task(self):
 
@@ -150,6 +167,8 @@ class VenusBlue(Node):
         motor_topic = self.get_parameter('motor_topic').value
         telementry_topic = self.get_parameter('telementry_topic').value
         commander = self.create_publisher(Twist, motor_topic, 10)
+        self.get_parameter('motor_topic').value
+        self.create_subscription(TFMessage, 'tf', self.location_callback, 10)
 
         while rclpy.ok():
 
