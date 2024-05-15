@@ -1,6 +1,6 @@
 import os
 import json
-import argparse
+import math
 import asyncio
 import paho.mqtt.client as mqtt
 
@@ -25,6 +25,7 @@ class VenusBlue(Node):
         self.declare_parameter('mqtt_server', 'csse4011-iot.zones.eait.uq.edu.au')
         self.declare_parameter('mqtt_port', 1883)
         self.declare_parameter('pedal_topic', 'venusBlueFootPedal')
+        self.declare_parameter('telementry_topic', 'venusBlueTelemetry')
         self.declare_parameter('motor_topic', 'cmd_vel')
 
         try:
@@ -147,31 +148,42 @@ class VenusBlue(Node):
     async def ros_task(self):
 
         motor_topic = self.get_parameter('motor_topic').value
+        telementry_topic = self.get_parameter('telementry_topic').value
         commander = self.create_publisher(Twist, motor_topic, 10)
 
         while rclpy.ok():
 
+            linear_max = 0.26
+            angular_max = 1.82
+
             # Wait for a command message.
             x, y, z = await self._messages.get()
 
-            vx = float((x & 0x7F) / 128.0 * 6)
-            vy = float((y & 0x3f) / 64 * 6)
+            # Get left and right linear velocities.
+            vx = float((x & 0x7F) / 128.0 * linear_max)
+            vy = float((y & 0x3f) / 64 * linear_max)
 
+            # Total velocity is magnitude of both.
+            velocity = min(math.sqrt(vx ** 2 + vy ** 2), linear_max)
+
+            # Angular is the difference between the velocities.
+            angular = (vy - vx) / (2 * linear_max) * angular_max
+            
             twist = Twist()
 
-            twist.linear.x = vx
-            twist.linear.y = vy
+            twist.linear.x = velocity
+            twist.linear.y = 0.0
             twist.linear.z = 0.0
-            twist.angular.x = vx
-            twist.angular.y = vy
-            twist.angular.z = 0.0
+            twist.angular.x = 0.0
+            twist.angular.y = 0.0
+            twist.angular.z = angular
 
-            # self._client.publish(
-            #     'venusBlueTelemetry',
-            #     json.dumps({"vx": vx, "vy": vy})
-            # )
+            self._client.publish(
+                telementry_topic,
+                json.dumps({"vx": vx, "vy": vy})
+            )
 
-            self.get_logger().info(f'send vx: {vx}, vy: {vy}')
+            self.get_logger().info(f'send vx: {vx}, vy: {vy}, velocity: {velocity}, angular: {angular}')
             commander.publish(twist)
 
     async def main(self):
