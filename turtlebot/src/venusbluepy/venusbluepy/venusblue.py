@@ -63,7 +63,13 @@ class VenusBlue(Node):
                 return
 
             self.get_logger().info('mqtt connected')
-            client.subscribe(self._input_topic)
+
+            # Subscribe to the pedal topic.
+            try:
+                pedal = self.get_parameter("pedal_topic").value
+                client.subscribe(pedal)
+            except Exception as err:
+                self.get_logger().error(f'failed to subscribe: {err}')
 
         @self._client.disconnect_callback()
         def disconnect_callback(client, userdata):
@@ -165,13 +171,12 @@ class VenusBlue(Node):
             #     json.dumps({"vx": vx, "vy": vy})
             # )
 
-            self.get_logger().info(f'send twist {twist}')
+            self.get_logger().info(f'send vx: {vx}, vy: {vy}')
             commander.publish(twist)
 
     async def main(self):
         await asyncio.gather(
             self.mqtt_task(),
-            # self.tester(),
             self.ros_task(),
             self.ros_update()
         )
