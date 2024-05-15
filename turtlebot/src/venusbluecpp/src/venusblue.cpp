@@ -48,12 +48,12 @@ int VenusBlue::main()
 {
     mqtt_connect();
 
-    for (;;) {
+    while (rclcpp::ok()) {
 
-        if (!rclcpp::ok())
-            break;
-
-        mqtt_connect();
+        if (!m_mqtt->is_connected() && !mqtt_connect()) {
+            std::this_thread::sleep_for(1s);
+            continue;
+        }
 
         // RCLCPP_INFO(get_logger(), "VenusBlue time is %f", rclcpp::Time::now().toSec());
         std::this_thread::sleep_for(1s);
@@ -120,15 +120,7 @@ bool VenusBlue::mqtt_connect()
         return false;
     }
 
-    if (!m_mqtt->is_connected()) {
-        RCLCPP_ERROR(
-            this->get_logger(),
-            "Failed to connect to mqtt. %s",
-            response->get_error_message().c_str()
-        );
-        return false;
-    }
-
+    RCLCPP_INFO(this->get_logger(), "mqtt connected");
     return true;
 }
 

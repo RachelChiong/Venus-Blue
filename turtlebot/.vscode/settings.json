@@ -1,3 +1,10 @@
 {
+    "ros_master_uri": "192.168.0.32",
+    "ros_hostname": "tb32",
+    "ros_domain_id": "32",
+
+    // "ros_master_uri": "192.168.0.39",
+    // "ros_hostname": "tb39",
+
     "C_Cpp.autoAddFileAssociations": false
 }

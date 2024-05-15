@@ -1,3 +1,4 @@
+import os
 import json
 import argparse
 import asyncio
@@ -26,6 +27,28 @@ class VenusBlue(Node):
         self.declare_parameter('pedal_topic', 'venusBlueFootPedal')
         self.declare_parameter('motor_topic', 'cmd_vel')
 
+        try:
+            ros_domain = os.environ["ROS_DOMAIN_ID"]
+            ros_hostname = os.environ["ROS_HOSTNAME"]
+            ros_uri = os.environ["ROS_MASTER_URI"]
+        except:
+            ros_domain = 'unknown'
+            ros_hostname = 'unknown'
+            ros_uri = 'unknown'
+
+        self.get_logger().info(
+            '\n' + '\n'.join([
+                'parameters:',
+                f'    ros_hostname: {ros_hostname}',
+                f'    ros_uri: {ros_uri}',
+                f'    ros_domain: {ros_domain}',
+                f'    mqtt_server: {self.get_parameter("mqtt_server").value}',
+                f'    mqtt_port: {self.get_parameter("mqtt_port").value}',
+                f'    pedal_topic: {self.get_parameter("pedal_topic").value}',
+                f'    motor_topic: {self.get_parameter("motor_topic").value}',
+            ])
+        )
+
         # Messages from mqtt to handle.
         self._messages = asyncio.Queue()
 
@@ -39,12 +62,12 @@ class VenusBlue(Node):
                 self.get_logger().error(f'failed to connect: {reason_code}')
                 return
 
-            self.get_logger().info('connected')
+            self.get_logger().info('mqtt connected')
             client.subscribe(self._input_topic)
 
         @self._client.disconnect_callback()
         def disconnect_callback(client, userdata):
-            self.get_logger().info(f'disconnected')
+            self.get_logger().info(f'mqtt disconnected')
 
         @self._client.subscribe_callback()
         def subscribe_callback(client, userdata, mid, reason_code_list, properties):
@@ -107,7 +130,7 @@ class VenusBlue(Node):
 
     async def tester(self):
         while rclpy.ok():
-            self._messages.put_nowait((0, 0, 0))
+            self._messages.put_nowait((1, 1, 0))
             await asyncio.sleep(1)
 
     async def ros_update(self):
@@ -141,14 +164,14 @@ class VenusBlue(Node):
             #     'venusBlueTelemetry',
             #     json.dumps({"vx": vx, "vy": vy})
             # )
-        
+
             self.get_logger().info(f'send twist {twist}')
             commander.publish(twist)
 
     async def main(self):
         await asyncio.gather(
-            # self.mqtt_task(),
-            self.tester(),
+            self.mqtt_task(),
+            # self.tester(),
             self.ros_task(),
             self.ros_update()
         )

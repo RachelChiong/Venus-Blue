@@ -22,10 +22,6 @@
 		"XDG_RUNTIME_DIR": "${localEnv:$XDG_RUNTIME_DIR}",
 		"PULSE_SERVER": "${localEnv:PULSE_SERVER}"
 	},
-	"postStartCommand": "echo 127.0.0.1 `hostname` >> /etc/hosts",
-	"appPort": [
-		"11883:1883"
-	],
 	"workspaceMount": "source=${localWorkspaceFolder},target=/root/venus_blue,type=bind,consistency=cached",
 	"workspaceFolder": "/root/venus_blue",
 	"customizations": {

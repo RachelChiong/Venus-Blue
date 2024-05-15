@@ -24,10 +24,61 @@
             "problemMatcher": []
         },
         {
-            "label": "Launch",
+            "label": "Launch Python",
             "detail": "Launches venusblue.",
             "type": "shell",
+            "options": {
+                "env": {
+                    "ROS_DOMAIN_ID": "${config:ros_domain_id}",
+                    "TURTLEBOT3_MODEL": "waffle_pi",
+                    "ROS_HOSTNAME": "${config:ros_hostname}",
+                    "ROS_MASTER_URI": "${config:ros_master_uri}"
+                }
+            },
             "command": "source install/setup.bash && ros2 launch venusbluepy venusblue.launch",
+            "problemMatcher": []
+        },
+        {
+            "label": "Launch C++",
+            "detail": "Launches venusblue.",
+            "type": "shell",
+            "command": "source install/setup.bash && ros2 launch venusbluecpp venusblue.launch",
+            "options": {
+                "env": {
+                    "ROS_DOMAIN_ID": "${config:ros_domain_id}",
+                    "ROS_HOSTNAME": "${config:ros_hostname}",
+                    "ROS_MASTER_URI": "${config:ros_master_uri}",
+                    "TURTLEBOT3_MODEL": "waffle_pi"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Teleop",
+            "type": "shell",
+            "command": "ros2 run turtlebot3_teleop teleop_keyboard",
+            "options": {
+                "env": {
+                    "ROS_DOMAIN_ID": "${config:ros_domain_id}",
+                    "ROS_HOSTNAME": "${config:ros_hostname}",
+                    "ROS_MASTER_URI": "${config:ros_master_uri}",
+                    "TURTLEBOT3_MODEL": "waffle_pi"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Term",
+            "type": "shell",
+            "command": "bash",
+            "options": {
+                "env": {
+                    "ROS_DOMAIN_ID": "${config:ros_domain_id}",
+                    "ROS_HOSTNAME": "${config:ros_hostname}",
+                    "ROS_MASTER_URI": "${config:ros_master_uri}",
+                    "TURTLEBOT3_MODEL": "waffle_pi"
+                }
+            },
             "problemMatcher": []
         }
     ]
