@@ -19,6 +19,17 @@ class VenusBlue(Node):
         ):
         super().__init__('venusblue')
 
+        self.frame = 0
+        self.childFrame = 0
+        self.odomX = 0
+        self.odomY = 0
+        self.baseX = 0
+        self.baseY = 0
+        self.xPos = 0
+        self.yPos = 0
+        self.yofs = 0
+        self.xofs = 0
+
         # Mqtt client to get messages from.
         self._client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
@@ -54,19 +65,28 @@ class VenusBlue(Node):
         # Messages from mqtt to handle.
         self._messages = asyncio.Queue()
 
-    
 
     async def location_callback(self, msg):
         telementry_topic = self.get_parameter('telementry_topic').value
         for tf in msg.transforms:
-            source = tf.header.frame_id
-            if source == 'map':
-                x = tf.transform.translation.x
-                y = tf.transform.translation.y
-                self._client.publish(
-                    telementry_topic,
-                json.dumps({"xpos": x, "ypos": y})
-            )
+            self.frame = tf.header.frame_id
+            self.childFrame = tf.child_frame_id
+
+            if self.frame == 'map' and self.childFrame == 'odom':
+                self.odomX = tf.transform.translation.x
+                self.odomY = tf.transform.translation.y
+            elif (self.frame == 'odom') and (self.childFrame == 'base_footprint'):
+                self.baseX = tf.transform.translation.x
+                self.baseY = tf.transform.translation.y
+        
+        self.xPos = self.odomX + self.baseX
+        self.yPos = self.odomY + self.baseY
+
+        # Values from calibration
+        self.xTrl = -((self.xPos * 0.5) + self.yPos * (-0.97) -0.33) +self.xofs
+        self.yTrl = (self.xPos * 0.8) + self.yPos * (0.24) -1.83 + self.yofs
+
+        self.get_logger().info("The turtlebot is at (" + str(self.xPos) + ", " + str(self.yPos) + ") from the start position")
 
 
 
@@ -172,8 +192,8 @@ class VenusBlue(Node):
 
         while rclpy.ok():
 
-            linear_max = 0.26
-            angular_max = 1.82
+            linear_max = 0.2 # 0.26
+            angular_max = 1.0 # 1.82
 
             # Wait for a command message.
             x, y, z = await self._messages.get()
@@ -189,6 +209,10 @@ class VenusBlue(Node):
             angular = (vy - vx) / (2 * linear_max) * angular_max
             
             twist = Twist()
+
+            if (z < 10):
+                velocity = -velocity
+                angular = -angular
 
             twist.linear.x = velocity
             twist.linear.y = 0.0
