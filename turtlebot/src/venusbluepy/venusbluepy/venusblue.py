@@ -187,6 +187,7 @@ class VenusBlue(Node):
             angular = (vy - vx) / (2 * linear_max) * angular_max
             
             twist = Twist()
+            
 
             if (z < 45):
                 velocity = -velocity
