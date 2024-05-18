@@ -7,6 +7,10 @@ import paho.mqtt.client as mqtt
 import rclpy
 from rclpy.node import Node
 
+from tf2_ros import TransformException
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
+
 from geometry_msgs.msg import Twist
 from tf2_msgs.msg import TFMessage
 
@@ -19,19 +23,10 @@ class VenusBlue(Node):
         ):
         super().__init__('venusblue')
 
-        self.frame = 0
-        self.childFrame = 0
-        self.odomX = 0
-        self.odomY = 0
-        self.baseX = 0
-        self.baseY = 0
-        self.xPos = 0
-        self.yPos = 0
-        self.yofs = 0
-        self.xofs = 0
-
         # Mqtt client to get messages from.
         self._client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.xPos = 0
+        self.yPos = 0
 
         # Declare parameters
         self.declare_parameter('mqtt_server', 'csse4011-iot.zones.eait.uq.edu.au')
@@ -63,31 +58,7 @@ class VenusBlue(Node):
         )
 
         # Messages from mqtt to handle.
-        self._messages = asyncio.Queue()
-
-
-    async def location_callback(self, msg):
-        telementry_topic = self.get_parameter('telementry_topic').value
-        for tf in msg.transforms:
-            self.frame = tf.header.frame_id
-            self.childFrame = tf.child_frame_id
-
-            if self.frame == 'map' and self.childFrame == 'odom':
-                self.odomX = tf.transform.translation.x
-                self.odomY = tf.transform.translation.y
-            elif (self.frame == 'odom') and (self.childFrame == 'base_footprint'):
-                self.baseX = tf.transform.translation.x
-                self.baseY = tf.transform.translation.y
-        
-        self.xPos = self.odomX + self.baseX
-        self.yPos = self.odomY + self.baseY
-
-        # Values from calibration
-        self.xTrl = -((self.xPos * 0.5) + self.yPos * (-0.97) -0.33) +self.xofs
-        self.yTrl = (self.xPos * 0.8) + self.yPos * (0.24) -1.83 + self.yofs
-
-        self.get_logger().info("The turtlebot is at (" + str(self.xPos) + ", " + str(self.yPos) + ") from the start position")
-
+        self._messages = asyncio.Queue()  
 
 
     async def mqtt_task(self):
@@ -188,7 +159,14 @@ class VenusBlue(Node):
         telementry_topic = self.get_parameter('telementry_topic').value
         commander = self.create_publisher(Twist, motor_topic, 10)
         self.get_parameter('motor_topic').value
-        self.create_subscription(TFMessage, 'tf', self.location_callback, 10)
+
+        self.target_frame = 'map'
+
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
+        # Call on_timer function every second
+        self.timer = self.create_timer(1.0, self.on_timer)
 
         while rclpy.ok():
 
@@ -210,7 +188,7 @@ class VenusBlue(Node):
             
             twist = Twist()
 
-            if (z < 10):
+            if (z < 45):
                 velocity = -velocity
                 angular = -angular
 
@@ -223,11 +201,30 @@ class VenusBlue(Node):
 
             self._client.publish(
                 telementry_topic,
-                json.dumps({"vx": vx, "vy": vy})
+                json.dumps({"vx": vx, "vy": vy, "linear":velocity, "angular": angular, "xLocation": self.xPos, "yLocation": self.yPos})
             )
 
             self.get_logger().info(f'send vx: {vx}, vy: {vy}, velocity: {velocity}, angular: {angular}')
             commander.publish(twist)
+
+    def on_timer(self):
+        # Store frame names in variables that will be used to
+        # compute transformations
+        from_frame_rel = 'base_footprint'
+        to_frame_rel = 'map'
+
+        try:
+            t = self.tf_buffer.lookup_transform(
+                to_frame_rel,
+                from_frame_rel,
+                rclpy.time.Time())
+        except TransformException as ex:
+            self.get_logger().info(
+            f'Could not transform {to_frame_rel} to {from_frame_rel}: {ex}')
+            return
+        
+        self.xPos = t.transform.translation.x
+        self.yPos = t.transform.translation.y
 
     async def main(self):
         await asyncio.gather(
