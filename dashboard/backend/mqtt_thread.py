@@ -34,6 +34,7 @@ class MqttThread(Thread):
         self.topic = topic
         self.payload = ""
         self.mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.isConnected = False
         print(f"[LOG] {self.name} thread initialised")
 
     def config(self, hostname, topic):
@@ -97,6 +98,7 @@ class MqttThread(Thread):
         else:
             # we should always subscribe from on_connect callback to be sure
             # our subscribed is persisted across reconnections.
+            self.isConnected = True
             client.subscribe(self.topic)
 
     def client_loop(self):

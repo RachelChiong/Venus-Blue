@@ -5207,6 +5207,11 @@ he@^1.2.0:
   resolved "https://registry.yarnpkg.com/he/-/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==
 
+highcharts-more@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/highcharts-more/-/highcharts-more-0.1.7.tgz#43cd6274cccba443166c94d4536d904bbabf9c77"
+  integrity sha512-3qK/gr5ZIJ/XJ+SeeazSlPttpsC5HWVN+bhYYDg+erZGJ3Kc1SFzoaZqozkrfNIccRoGlm1UQMouChHT3TG0jQ==
+
 highcharts-react-official@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/highcharts-react-official/-/highcharts-react-official-3.2.1.tgz#4b62a7af2969bdebde6b338d36f6b9bf1f1029bc"

@@ -3,6 +3,8 @@ FROM node:alpine
 
 # Set working directory
 WORKDIR /app
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
 # Copy package.json and yarn.lock to install dependencies
 COPY package.json yarn.lock ./
