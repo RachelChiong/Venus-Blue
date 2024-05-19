@@ -1,6 +1,6 @@
 """
 Main.py
-Prac 3 for PC-GUI - Flask backend for PC-GUI
+Venus-Blue PC-GUI - Flask backend for PC-GUI
 Semester 1, 2024
 CSSE4011
 """
@@ -69,7 +69,6 @@ def get_footpedal():
 @app.route('/localisation')
 @cross_origin()
 def get_localisation():
-
     return Th_Localisation.get_payload()
 
 if __name__ == '__main__':

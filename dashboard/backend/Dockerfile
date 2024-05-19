@@ -4,6 +4,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 EXPOSE 5001
+
 ENV FLASK_APP=app.py
 
 COPY . /app

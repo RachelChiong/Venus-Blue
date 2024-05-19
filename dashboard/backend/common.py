@@ -20,7 +20,11 @@ FOOTPEDAL_PACKET = {
 
 TELEMETRY_PACKET = {
     "vx": 0,
-    "vy": 0
+    "vy": 0,
+    "linear": 0,
+    "angular": 0,
+    "xLocation": 0,
+    "yLocation": 0
 }
 
 LOCALISATION_PACKET = {

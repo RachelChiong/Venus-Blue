@@ -14,7 +14,6 @@ import numpy as np
 
 __author__ = "Rachel Chiong"
 
-Data_Packet = "{\"distance\": %f}"
 data = ""
 HOST = "csse4011-iot.zones.eait.uq.edu.au"
 MQTT_TOPIC = "46980388"
