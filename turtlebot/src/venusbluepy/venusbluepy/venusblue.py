@@ -170,8 +170,8 @@ class VenusBlue(Node):
 
         while rclpy.ok():
 
-            linear_max = 0.2 # 0.26
-            angular_max = 1.0 # 1.82
+            linear_max = 0.18 # 0.26
+            angular_max = 0.80 # 1.82
 
             # Wait for a command message.
             x, y, z = await self._messages.get()
