@@ -11,7 +11,6 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/launch', ['launch/venusblue.launch']),
-        ('share/' + package_name + '/launch', ['launch/acml.launch'])
     ],
     install_requires=['setuptools'],
     zip_safe=True,

@@ -175,16 +175,18 @@ class VenusBlue(Node):
 
             # Wait for a command message.
             x, y, z = await self._messages.get()
+            x = min (x, 230)
+            y = min (y, 230)
 
             # Get left and right linear velocities.
-            vx = float((x & 0x7F) / 128.0 * linear_max)
-            vy = float((y & 0x3f) / 64 * linear_max)
+            vx = float(((x & 0x7F) / 128.0) * linear_max)
+            vy = float(((y & 0x3f) / 64) * linear_max)
 
             # Total velocity is magnitude of both.
             velocity = min(math.sqrt(vx ** 2 + vy ** 2), linear_max)
 
             # Angular is the difference between the velocities.
-            angular = (vy - vx) / (2 * linear_max) * angular_max
+            angular = min((vy - vx) / (2 * linear_max) * angular_max, angular_max)
             
             twist = Twist()
             
